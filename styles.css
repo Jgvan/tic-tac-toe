@@ -13,6 +13,10 @@
         height: 75vw;
         width: 75vw;
     }
+
+    .square {
+        font-size: 20vw;
+    }
 }
 
 /* Desktop style */
@@ -22,6 +26,10 @@
         margin-top: 50px;
         height: 30vw;
         width: 30vw;
+    }
+
+    .square {
+        font-size: 8vw;
     }
 }
 
@@ -46,17 +54,23 @@
     align-items: center;
 }
 
+.game-grid, button {
+    user-select: none;
+    -moz-user-select: none;
+    -webkit-user-select: none;
+}
+
 .game-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    grid-template-rows: repeat(3, 1fr);
+    grid-template-columns: repeat(3, auto);
+    grid-template-rows: repeat(3, auto);
     background-color: rgb(124, 119, 119);
     gap: 1px;
 }
 
 .square {
     background-color: rgb(255, 228, 196);
-    font-size: 8rem;
+    
     color: rgba(0, 0, 0, 1);
     display: flex;
     align-content: center;

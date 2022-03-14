@@ -19,19 +19,20 @@
     </div>
     <div class="main">
         <div class="controls">
-            <button class="two-player">2 players</button>
-            <button class="versus-ai">1 player vs AI</button>
+            <button onclick="gameController.newTwoPlayerGame()" class="two-player">2 players</button>
+            <button onclick="gameController.newSinglePlayerGame()" class="versus-ai">1 player vs AI</button>
+            <button onclick="btn()">fd</button>
         </div>
         <div class="game-grid">
-            <div class="square unselected" value="1"><p>X</p></div>
-            <div class="square unselected" value="2"><p>X</p></div>
-            <div class="square unselected" value="3"><p>O</p></div>
-            <div class="square unselected" value="4"><p>X</p></div>
-            <div class="square unselected" value="5"><p>O</p></div>
-            <div class="square unselected" value="6"><p>X</p></div>
-            <div class="square unselected" value="7"><p>O</p></div>
-            <div class="square unselected" value="8"><p>X</p></div>
-            <div class="square unselected" value="9"><p>O</p></div>
+            <div class="square" value="0"><p>X</p></div>
+            <div class="square" value="1"><p>O</p></div>
+            <div class="square" value="2"><p>X</p></div>
+            <div class="square" value="3"><p>O</p></div>
+            <div class="square" value="4"><p>X</p></div>
+            <div class="square" value="5"><p>O</p></div>
+            <div class="square" value="6"><p>X</p></div>
+            <div class="square" value="7"><p>O</p></div>
+            <div class="square" value="8"><p>X</p></div>
         </div>
     </div>
 </body>
