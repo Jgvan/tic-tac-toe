@@ -62,8 +62,8 @@
 
 .game-grid {
     display: grid;
-    grid-template-columns: repeat(3, auto);
-    grid-template-rows: repeat(3, auto);
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 1fr);
     background-color: rgb(124, 119, 119);
     gap: 1px;
 }
@@ -87,4 +87,9 @@
 
 .square.unselected:hover {
     color: rgba(0, 0, 0, 0.2);
+}
+
+.game-text {
+    margin-top: 40px;
+    font-size: 3rem;
 }
