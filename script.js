@@ -22,6 +22,7 @@ const gameBoard = (() => {
         for (let i = 0; i < winningCombos.length; i++) {
             if ((gridArray[winningCombos[i][0]] === marker) && (gridArray[winningCombos[i][1]] === marker) && (gridArray[winningCombos[i][2]] === marker)) {
                 displayController.setGameText(playerController.getActivePlayer().getName() + " wins!");
+                displayController.displayWinningSquares(winningCombos[i]);
                 return true;
             }
         }
@@ -80,6 +81,7 @@ const displayController = (() => {
 
         squares.forEach((square) => {
             square.classList.add("unselected");
+            square.classList.remove("winner");
         });
         gameBoard.resetGame();
     }
@@ -94,7 +96,13 @@ const displayController = (() => {
         }
     }
 
-    return { toggleSquareSelection, resetGrid, addGridEventListener, removeGridEventListener, setGameText }
+    const displayWinningSquares = squares => {
+        for(let i = 0; i < squares.length; i++) {
+            document.querySelector(`[data-value="${squares[i]}"]`).classList.add("winner");
+        }
+    }
+
+    return { toggleSquareSelection, resetGrid, addGridEventListener, removeGridEventListener, setGameText, displayWinningSquares }
 })();
 
 
