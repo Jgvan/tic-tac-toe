@@ -6,6 +6,8 @@ const gameBoard = (() => {
         gridArray = Array(9).fill("");
     }
 
+    const getBoardArray = () => gridArray;
+
     //Did anyone win?
     const checkForWinner = marker => {
         const winningCombos = [
@@ -41,7 +43,16 @@ const gameBoard = (() => {
         }
     }
 
-    return { resetGame, addMarker }
+    const getIndices = (val) => {
+        let indices = [];
+        let i = -1;
+        while ((i = gridArray.indexOf(val, i + 1)) != -1) {
+            indices.push(i);
+        }
+        return indices;
+    }
+
+    return { resetGame, addMarker, getBoardArray, getIndices }
 })();
 
 //Player object
@@ -93,16 +104,24 @@ const displayController = (() => {
             event.target.classList.remove("unselected");
             gameBoard.addMarker(event.target.dataset.value, playerController.getActivePlayer().getMarker());
             playerController.switchActivePlayer();
+            // console.log(gameBoard.getIndices(""));
         }
     }
 
+    const placeAIMarker = pos => {
+        const square = document.querySelector(`[data-value="${pos}"]`);
+        square.classList.remove("unselected");
+        gameBoard.addMarker(pos, playerController.getActivePlayer().getMarker());
+        playerController.switchActivePlayer();
+    }
+
     const displayWinningSquares = squares => {
-        for(let i = 0; i < squares.length; i++) {
+        for (let i = 0; i < squares.length; i++) {
             document.querySelector(`[data-value="${squares[i]}"]`).classList.add("winner");
         }
     }
 
-    return { toggleSquareSelection, resetGrid, addGridEventListener, removeGridEventListener, setGameText, displayWinningSquares }
+    return { toggleSquareSelection, resetGrid, addGridEventListener, removeGridEventListener, setGameText, displayWinningSquares, placeAIMarker }
 })();
 
 
@@ -128,8 +147,15 @@ const playerController = (() => {
         else {
             activePlayer = playerOne;
         }
-        if (activePlayer.isAI) {
-            //TODO: If AI then run AI pick command
+        if (activePlayer.getIsAI()) {
+            if(!gameController.getGameStatus()) return;
+            displayController.removeGridEventListener();
+            displayController.toggleSquareSelection(activePlayer.getMarker());
+            setTimeout(() => {
+                gameController.AIMove();
+                if(!gameController.getGameStatus()) return;
+                displayController.addGridEventListener();
+            }, 350);
         }
         if (gameController.getGameStatus()) { displayController.toggleSquareSelection(activePlayer.getMarker()); }
     }
@@ -141,7 +167,7 @@ const playerController = (() => {
 
 const gameController = (() => {
     let gameRunning = false;
-    
+
     //Starts a new player vs player game
     const newTwoPlayerGame = () => {
         const pOne = player("X", "Player One", false);
@@ -176,7 +202,12 @@ const gameController = (() => {
 
     const getGameStatus = () => gameRunning;
 
+    const AIMove = () => {
+        const options = gameBoard.getIndices("");
+        const choice = options[Math.floor(Math.random() * options.length)];
+        displayController.placeAIMarker(choice);
+    }
 
-    return { newTwoPlayerGame, newSinglePlayerGame, gameOver, getGameStatus }
+    return { newTwoPlayerGame, newSinglePlayerGame, gameOver, getGameStatus, AIMove }
 })();
 

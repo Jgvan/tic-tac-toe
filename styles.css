@@ -54,6 +54,7 @@
     padding: 1.5rem 3rem 1.5rem 3rem;
     border-radius: 8px;
     margin: 10px;
+    cursor: pointer;
 }
 
 .main {
@@ -100,10 +101,6 @@
 
 .winner{
     color: red;
-}
-
-#two-player {
-    cursor: pointer;
 }
 
 button.disabled {
