@@ -9,32 +9,47 @@ const gameBoard = (() => {
     const getBoardArray = () => gridArray;
 
     //Did anyone win?
-    const checkForWinner = marker => {
+    const checkForWinner = isSimulation => {
         const winningCombos = [
             [0, 1, 2],
-            [3, 4, 5],
-            [6, 7, 8],
             [0, 3, 6],
+            [0, 4, 8],
             [1, 4, 7],
             [2, 5, 8],
-            [0, 4, 8],
-            [2, 4, 6]
-        ];
-
+            [3, 4, 5],
+            [2, 4, 6],
+            [6, 7, 8]
+        ]
         for (let i = 0; i < winningCombos.length; i++) {
-            if ((gridArray[winningCombos[i][0]] === marker) && (gridArray[winningCombos[i][1]] === marker) && (gridArray[winningCombos[i][2]] === marker)) {
-                displayController.setGameText(playerController.getActivePlayer().getName() + " wins!");
-                displayController.displayWinningSquares(winningCombos[i]);
-                return true;
+            if (gridArray[winningCombos[i][0]] === gridArray[winningCombos[i][1]] && gridArray[winningCombos[i][1]] === gridArray[winningCombos[i][2]] && gridArray[winningCombos[i][0]] != "") {
+                // console.log("test");
+                if (!isSimulation) {
+                    displayController.setGameText(playerController.getActivePlayer().getName() + " wins!");
+                    displayController.displayWinningSquares(winningCombos[i]);
+                }
+                // console.log(gridArray[winningCombos[i][0]]);
+                return gridArray[winningCombos[i][0]];
+
+                // if ((gridArray[winningCombos[i][0]] === marker) && (gridArray[winningCombos[i][1]] === marker) && (gridArray[winningCombos[i][2]] === marker)) {
+                //     if (!isSimulation) {
+                //         displayController.setGameText(playerController.getActivePlayer().getName() + " wins!");
+                //         displayController.displayWinningSquares(winningCombos[i]);
+                //     }
+                //     // return true;
+                //     return marker;
+                // }
             }
+
+            // return false;
         }
-        return false;
+        if (!gridArray.includes("")) { return "tie"; }
+        return;
     }
 
     //Add marker to the array
     const addMarker = (position, marker) => {
         gridArray[parseInt(position)] = marker;
-        if (checkForWinner(marker)) {
+        if (checkForWinner(false) === marker) {
             gameController.gameOver();
         }
         else if (!gridArray.includes("")) {
@@ -52,16 +67,22 @@ const gameBoard = (() => {
         return indices;
     }
 
-    return { resetGame, addMarker, getBoardArray, getIndices }
+    //Add and remove from array during MiniMax algorithm without changing the game state
+    const editArray = (position, marker) => {
+        gridArray[parseInt(position)] = marker;
+    }
+
+    return { resetGame, addMarker, getBoardArray, getIndices, editArray, checkForWinner }
 })();
 
 //Player object
-const player = (marker, playerName, isAI) => {
+const player = (marker, playerName, isAI, isSmart) => {
     const getName = () => playerName;
     const getMarker = () => marker;
     const getIsAI = () => isAI;
+    const getIsSmart = () => isSmart;
 
-    return { getName, getMarker, getIsAI }
+    return { getName, getMarker, getIsAI, getIsSmart }
 }
 
 //Runs the display changes
@@ -69,6 +90,18 @@ const displayController = (() => {
 
     const gameGrid = document.querySelector(".game-grid");
     const gameText = document.querySelector(".game-text");
+    const playButton = document.getElementById("play");
+
+    const togglePlayButton = () => {
+        if (playButton.classList.contains("disabled")) {
+            playButton.classList.remove("disabled");
+            playButton.addEventListener("click", gameController.play);
+        }
+        else {
+            playButton.classList.add("disabled");
+            playButton.removeEventListener("click", gameController.play);
+        }
+    }
 
     const addGridEventListener = () => {
         gameGrid.addEventListener("click", placeMarker);
@@ -121,7 +154,35 @@ const displayController = (() => {
         }
     }
 
-    return { toggleSquareSelection, resetGrid, addGridEventListener, removeGridEventListener, setGameText, displayWinningSquares, placeAIMarker }
+    const getPlayers = () => {
+        let players = [];
+
+        let playerOneName = document.getElementById("player-one");
+        let playerTwoName = document.getElementById("player-two");
+        let isPlayerOneAI = document.getElementById("ai-one");
+        let isPlayerTwoAI = document.getElementById("ai-two");
+        let isAiOneSmart = document.getElementById("ai-one-difficulty");
+        let isAiTwoSmart = document.getElementById("ai-two-difficulty");
+
+        playerOneName = playerOneName.value === "" ? playerOneName.placeholder : playerOneName.value;
+        playerTwoName = playerTwoName.value === "" ? playerTwoName.placeholder : playerTwoName.value;
+        isPlayerOneAI = isPlayerOneAI.checked ? true : false;
+        isPlayerTwoAI = isPlayerTwoAI.checked ? true : false;
+        isAiOneSmart = isAiOneSmart.value === "hard" ? true : false;
+        isAiTwoSmart = isAiTwoSmart.value === "hard" ? true : false;
+
+        let playerOne = player("X", playerOneName, isPlayerOneAI, isAiOneSmart);
+        let playerTwo = player("O", playerTwoName, isPlayerTwoAI, isAiTwoSmart);
+
+        players.push(playerOne);
+        players.push(playerTwo);
+        return players;
+    }
+
+    return {
+        toggleSquareSelection, resetGrid, addGridEventListener, removeGridEventListener, setGameText,
+        displayWinningSquares, placeAIMarker, getPlayers, togglePlayButton
+    }
 })();
 
 
@@ -131,13 +192,10 @@ const playerController = (() => {
     let playerTwo;
     let activePlayer;
 
-    //Set player one and also set him to be first active player
-    const setPlayerOne = player => {
-        playerOne = player;
-        activePlayer = playerOne;
-    }
-    const setPlayerTwo = player => {
-        playerTwo = player;
+    const setPlayers = (pOne, pTwo) => {
+        playerOne = pOne;
+        playerTwo = pTwo;
+        activePlayer = undefined;
     }
 
     const switchActivePlayer = () => {
@@ -148,56 +206,58 @@ const playerController = (() => {
             activePlayer = playerOne;
         }
         if (activePlayer.getIsAI()) {
-            if(!gameController.getGameStatus()) return;
+            if (!gameController.getGameStatus()) return;
             displayController.removeGridEventListener();
             displayController.toggleSquareSelection(activePlayer.getMarker());
             setTimeout(() => {
-                gameController.AIMove();
-                if(!gameController.getGameStatus()) return;
+                if (activePlayer.getIsSmart()) {
+                    gameController.AISmartMove();
+                }
+                else {
+                    gameController.AIMove();
+                }
+                if (!gameController.getGameStatus()) return;
                 displayController.addGridEventListener();
-            }, 350);
+            }, 300);
         }
         if (gameController.getGameStatus()) { displayController.toggleSquareSelection(activePlayer.getMarker()); }
     }
 
     const getActivePlayer = () => activePlayer;
 
-    return { setPlayerOne, setPlayerTwo, switchActivePlayer, getActivePlayer }
+    const isPlayerOne = () => {
+        if (activePlayer === playerOne) { return true; }
+        else { return false; }
+    }
+
+    return { setPlayers, switchActivePlayer, getActivePlayer, isPlayerOne }
 })();
 
 const gameController = (() => {
     let gameRunning = false;
 
-    //Starts a new player vs player game
-    const newTwoPlayerGame = () => {
-        const pOne = player("X", "Player One", false);
-        const pTwo = player("O", "Player Two", false);
-        playerController.setPlayerOne(pOne);
-        playerController.setPlayerTwo(pTwo);
-        start();
-    }
+    const play = () => {
+        let players = displayController.getPlayers();
 
-    //Starts a new player vs AI game
-    const newSinglePlayerGame = () => {
-        const pOne = player("X", "Player One", false);
-        const pTwo = player("O", "AI", true);
-        playerController.setPlayerOne(pOne);
-        playerController.setPlayerTwo(pTwo);
+        playerController.setPlayers(players[0], players[1]);
         start();
     }
 
     const start = () => {
+        gameOver();
         displayController.resetGrid();
         displayController.toggleSquareSelection("X");
         displayController.addGridEventListener();
         displayController.setGameText("");
         gameRunning = true;
+        playerController.switchActivePlayer();
     }
 
     const gameOver = () => {
         displayController.toggleSquareSelection("");
         displayController.removeGridEventListener();
         gameRunning = false;
+        displayController.togglePlayButton();
     }
 
     const getGameStatus = () => gameRunning;
@@ -208,6 +268,83 @@ const gameController = (() => {
         displayController.placeAIMarker(choice);
     }
 
-    return { newTwoPlayerGame, newSinglePlayerGame, gameOver, getGameStatus, AIMove }
+    const AISmartMove = () => {
+        if (gameBoard.getIndices("").length === 9) {
+            displayController.placeAIMarker(randomCorner());
+        }
+        else{
+            displayController.placeAIMarker(AIController.bestMove());
+        }
+
+    }
+
+    const randomCorner = () => {
+        let corners = [0, 2, 6, 8];
+        return corners[Math.floor(Math.random() * 4)];
+    }
+
+    return { gameOver, getGameStatus, AIMove, AISmartMove, play }
 })();
 
+
+const AIController = (() => {
+
+    const bestMove = () => {
+        let nextMove;
+        let openMoves = gameBoard.getIndices("");
+
+        let maxScore = -Infinity;
+        for (let i = 0; i < openMoves.length; i++) {
+            gameBoard.editArray(openMoves[i], playerController.getActivePlayer().getMarker());
+            let score = miniMax(0, false);
+            gameBoard.editArray(openMoves[i], "");
+            if (score > maxScore) {
+                maxScore = score;
+                nextMove = openMoves[i];
+            }
+        }
+        return nextMove;
+    }
+
+    const miniMax = (depth, isMaximizing) => {
+        let openMoves = gameBoard.getIndices("");
+        let marker = playerController.getActivePlayer().getMarker();
+        let result = gameBoard.checkForWinner(true);
+
+        if (result === "tie") {
+            return 0;
+        }
+        if (result === marker) {
+            return 10 - depth;
+        }
+        else if (result != undefined) {
+            return -10 + depth;
+        }
+        //Maximizing player
+        if (isMaximizing) {
+            let maxScore = -Infinity;
+            for (let i = 0; i < openMoves.length; i++) {
+                gameBoard.editArray(openMoves[i], marker);
+                let score = miniMax(depth + 1, false);
+                gameBoard.editArray(openMoves[i], "");
+                maxScore = Math.max(score, maxScore);
+            }
+            return maxScore;
+        }
+        //Minimizing player
+        else {
+            let minScore = Infinity;
+            for (let i = 0; i < openMoves.length; i++) {
+                let oppositeMarker = marker === "X" ? "O" : "X";
+                gameBoard.editArray(openMoves[i], oppositeMarker);
+                let score = miniMax(depth + 1, true);
+                gameBoard.editArray(openMoves[i], "");
+                minScore = Math.min(score, minScore);
+            }
+            return minScore;
+        }
+    }
+    return { bestMove }
+})();
+
+displayController.togglePlayButton();

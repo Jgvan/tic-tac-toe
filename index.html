@@ -19,8 +19,30 @@
     </div>
     <div class="main">
         <div class="controls">
-            <button onclick="gameController.newTwoPlayerGame()" id="two-player">2 players</button>
-            <button onclick="gameController.newSinglePlayerGame()" id="versus-ai">1 player vs AI</button>
+            <div class="player-control">
+                <input type="text" name="player-one" id="player-one" placeholder="Jack">
+                <p>
+                    <input type="checkbox" name="ai-one" id="ai-one">
+                    <label for="ai-one">AI player</label>
+                    <select name="ai-one-difficulty" id="ai-one-difficulty">
+                        <option value="easy">Easy</option>
+                        <option value="hard">Hard</option>
+                    </select>
+                </p>
+
+            </div>
+            <button class="disabled" id="play">Play!</button>
+            <div class="player-control">
+                <input type="text" name="player-two" id="player-two" placeholder="Jane">
+                <p>
+                    <input type="checkbox" name="ai-two" id="ai-two">
+                    <label for="ai-two">AI player</label>
+                    <select name="ai-two-difficulty" id="ai-two-difficulty">
+                        <option value="easy">Easy</option>
+                        <option value="hard">Hard</option>
+                    </select>
+                </p>
+            </div>
         </div>
         <div class="game-grid">
             <div class="square" data-value="0">T</div>

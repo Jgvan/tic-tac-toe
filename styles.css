@@ -53,7 +53,6 @@
     background-color: rgb(255, 58, 32);
     padding: 1.5rem 3rem 1.5rem 3rem;
     border-radius: 8px;
-    margin: 10px;
     cursor: pointer;
 }
 
@@ -61,6 +60,17 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+}
+
+.controls {
+    display: flex;
+    margin: 10px;
+    gap: 25px;
+    align-items: center;
+}
+
+#player-one, #player-two {
+    margin-bottom: 8px;
 }
 
 .game-grid, button {
@@ -105,4 +115,5 @@
 
 button.disabled {
     background-color: rgb(189, 181, 181);
+    cursor: default;
 }
