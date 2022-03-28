@@ -22,25 +22,13 @@ const gameBoard = (() => {
         ]
         for (let i = 0; i < winningCombos.length; i++) {
             if (gridArray[winningCombos[i][0]] === gridArray[winningCombos[i][1]] && gridArray[winningCombos[i][1]] === gridArray[winningCombos[i][2]] && gridArray[winningCombos[i][0]] != "") {
-                // console.log("test");
+                //Only display winner if it was from actual gameplay
                 if (!isSimulation) {
                     displayController.setGameText(playerController.getActivePlayer().getName() + " wins!");
                     displayController.displayWinningSquares(winningCombos[i]);
                 }
-                // console.log(gridArray[winningCombos[i][0]]);
                 return gridArray[winningCombos[i][0]];
-
-                // if ((gridArray[winningCombos[i][0]] === marker) && (gridArray[winningCombos[i][1]] === marker) && (gridArray[winningCombos[i][2]] === marker)) {
-                //     if (!isSimulation) {
-                //         displayController.setGameText(playerController.getActivePlayer().getName() + " wins!");
-                //         displayController.displayWinningSquares(winningCombos[i]);
-                //     }
-                //     // return true;
-                //     return marker;
-                // }
             }
-
-            // return false;
         }
         if (!gridArray.includes("")) { return "tie"; }
         return;
@@ -58,6 +46,7 @@ const gameBoard = (() => {
         }
     }
 
+    //Get indices of val from board array
     const getIndices = (val) => {
         let indices = [];
         let i = -1;
@@ -92,17 +81,18 @@ const displayController = (() => {
     const gameText = document.querySelector(".game-text");
     const playButton = document.getElementById("play");
 
+    //Turn play button on/off
     const togglePlayButton = () => {
         if (playButton.classList.contains("disabled")) {
             playButton.classList.remove("disabled");
-            playButton.addEventListener("click", gameController.play);
+            playButton.addEventListener("click", gameController.start);
         }
         else {
             playButton.classList.add("disabled");
-            playButton.removeEventListener("click", gameController.play);
+            playButton.removeEventListener("click", gameController.start);
         }
     }
-
+    //Turn event listener for squares on and off when switching between player and AI
     const addGridEventListener = () => {
         gameGrid.addEventListener("click", placeMarker);
     }
@@ -120,6 +110,7 @@ const displayController = (() => {
         });
     }
 
+    
     const resetGrid = () => {
         let squares = document.querySelectorAll(".square");
 
@@ -132,6 +123,7 @@ const displayController = (() => {
 
     const setGameText = msg => gameText.textContent = msg;
 
+    //Player turn click
     const placeMarker = event => {
         if (event.target.classList.contains("unselected")) {
             event.target.classList.remove("unselected");
@@ -141,6 +133,7 @@ const displayController = (() => {
         }
     }
 
+    //AI turn click
     const placeAIMarker = pos => {
         const square = document.querySelector(`[data-value="${pos}"]`);
         square.classList.remove("unselected");
@@ -148,13 +141,15 @@ const displayController = (() => {
         playerController.switchActivePlayer();
     }
 
+    //Highlight winning combo
     const displayWinningSquares = squares => {
         for (let i = 0; i < squares.length; i++) {
             document.querySelector(`[data-value="${squares[i]}"]`).classList.add("winner");
         }
     }
 
-    const getPlayers = () => {
+    //Create players based on the input
+    const createPlayers = () => {
         let players = [];
 
         let playerOneName = document.getElementById("player-one");
@@ -181,7 +176,7 @@ const displayController = (() => {
 
     return {
         toggleSquareSelection, resetGrid, addGridEventListener, removeGridEventListener, setGameText,
-        displayWinningSquares, placeAIMarker, getPlayers, togglePlayButton
+        displayWinningSquares, placeAIMarker, createPlayers, togglePlayButton
     }
 })();
 
@@ -197,7 +192,8 @@ const playerController = (() => {
         playerTwo = pTwo;
         activePlayer = undefined;
     }
-
+    
+    //Change between active players after each turn. If next player is AI, it makes a move automatically.
     const switchActivePlayer = () => {
         if (activePlayer === playerOne) {
             activePlayer = playerTwo;
@@ -236,15 +232,11 @@ const playerController = (() => {
 const gameController = (() => {
     let gameRunning = false;
 
-    const play = () => {
-        let players = displayController.getPlayers();
-
-        playerController.setPlayers(players[0], players[1]);
-        start();
-    }
-
+    //Clear the game board and start new game.
     const start = () => {
         gameOver();
+        let players = displayController.createPlayers();
+        playerController.setPlayers(players[0], players[1]);
         displayController.resetGrid();
         displayController.toggleSquareSelection("X");
         displayController.addGridEventListener();
@@ -253,6 +245,7 @@ const gameController = (() => {
         playerController.switchActivePlayer();
     }
 
+    //Game over
     const gameOver = () => {
         displayController.toggleSquareSelection("");
         displayController.removeGridEventListener();
@@ -262,12 +255,14 @@ const gameController = (() => {
 
     const getGameStatus = () => gameRunning;
 
+    //Random AI move
     const AIMove = () => {
         const options = gameBoard.getIndices("");
         const choice = options[Math.floor(Math.random() * options.length)];
         displayController.placeAIMarker(choice);
     }
 
+    //Minimax AI move
     const AISmartMove = () => {
         if (gameBoard.getIndices("").length === 9) {
             displayController.placeAIMarker(randomCorner());
@@ -278,15 +273,16 @@ const gameController = (() => {
 
     }
 
+    //First turn? Pick a random corner
     const randomCorner = () => {
         let corners = [0, 2, 6, 8];
         return corners[Math.floor(Math.random() * 4)];
     }
 
-    return { gameOver, getGameStatus, AIMove, AISmartMove, play }
+    return { gameOver, getGameStatus, AIMove, AISmartMove, start }
 })();
 
-
+//MiniMax algorithm for finding the optimal move. Unbeatable AI.
 const AIController = (() => {
 
     const bestMove = () => {
