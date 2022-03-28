@@ -2,6 +2,4 @@
 
 A tic-tac-toe game for [The Odin Project](https://www.theodinproject.com/paths/full-stack-javascript/courses/javascript/lessons/tic-tac-toe)
 
-How it will work: 2 player game, or 1 against AI.
-
-Extra credits: Make unbeatable AI
+A game with two players, either human or AI, battle to get 3 squares in a row. Play against Easy AI for a easy win, or Hard AI for a impossible game powered by the minimax algorithm.
