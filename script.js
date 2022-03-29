@@ -174,9 +174,22 @@ const displayController = (() => {
         return players;
     }
 
+    //Add or remove hover class to squares
+    const setHoverClass = enable => {
+        let squares = document.querySelectorAll(".square")
+        squares.forEach(square => {
+            if(enable === true && square.classList.contains("unselected")){
+                square.classList.add("hover");
+            }
+            else {
+                square.classList.remove("hover");
+            }
+        });
+    }
+
     return {
         toggleSquareSelection, resetGrid, addGridEventListener, removeGridEventListener, setGameText,
-        displayWinningSquares, placeAIMarker, createPlayers, togglePlayButton
+        displayWinningSquares, placeAIMarker, createPlayers, togglePlayButton, setHoverClass
     }
 })();
 
@@ -202,6 +215,7 @@ const playerController = (() => {
             activePlayer = playerOne;
         }
         if (activePlayer.getIsAI()) {
+            displayController.setHoverClass(false);
             if (!gameController.getGameStatus()) return;
             displayController.removeGridEventListener();
             displayController.toggleSquareSelection(activePlayer.getMarker());
@@ -214,8 +228,9 @@ const playerController = (() => {
                 }
                 if (!gameController.getGameStatus()) return;
                 displayController.addGridEventListener();
-            }, 300);
+            }, 3000);
         }
+        else displayController.setHoverClass(true);
         if (gameController.getGameStatus()) { displayController.toggleSquareSelection(activePlayer.getMarker()); }
     }
 

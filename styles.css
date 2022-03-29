@@ -21,6 +21,49 @@
     .winner {
         font-size: 20vw;
     }
+
+    .controls {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: 1fr 1fr;
+        margin: 10px;
+        gap: 25px;
+        align-items: center;
+        justify-content: center;
+    }
+
+    #play {
+        grid-column: 1/3;
+        grid-row: 2;
+    }
+}
+
+/* Tiny screen */
+
+@media only screen and (max-width: 400px) {
+
+    .controls {
+        display: grid;
+        grid-template-rows: 1fr 1fr 1fr;
+        grid-template-columns: 1fr;
+        margin: 10px;
+        gap: 25px;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .first {
+        grid-row: 1/2;
+    }
+
+    .second {
+        grid-row: 2/3;
+    }
+
+    #play {
+        grid-row: 3/4;
+        grid-column: 1;
+    }
 }
 
 /* Desktop style */
@@ -39,6 +82,13 @@
     .winner {
         font-size: 8vw;
     }
+
+    .controls {
+        display: flex;
+        margin: 10px;
+        gap: 25px;
+        align-items: center;
+    }
 }
 
 .header h1 {
@@ -50,8 +100,9 @@
 
 .main button {
     border: none;
+    font-size: 1.5rem;
     background-color: rgb(255, 58, 32);
-    padding: 1.5rem 3rem 1.5rem 3rem;
+    padding: 1.2rem 2.5rem 1.2rem 2.5rem;
     border-radius: 8px;
     cursor: pointer;
 }
@@ -62,15 +113,13 @@
     align-items: center;
 }
 
-.controls {
-    display: flex;
-    margin: 10px;
-    gap: 25px;
-    align-items: center;
-}
-
 #player-one, #player-two {
     margin-bottom: 8px;
+}
+
+.player-control p:first-child {
+    margin-bottom: 8px;
+    text-align: center;
 }
 
 .game-grid, button {
@@ -96,11 +145,11 @@
     justify-content: center;
 }
 
-.square.unselected{
+.square.unselected, .hover{
     color: rgba(0, 0, 0, 0);
 }
 
-.square.unselected:hover {
+.hover:hover {
     color: rgba(0, 0, 0, 0.2);
 }
 
