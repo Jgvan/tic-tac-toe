@@ -228,7 +228,7 @@ const playerController = (() => {
                 }
                 if (!gameController.getGameStatus()) return;
                 displayController.addGridEventListener();
-            }, 3000);
+            }, 350);
         }
         else displayController.setHoverClass(true);
         if (gameController.getGameStatus()) { displayController.toggleSquareSelection(activePlayer.getMarker()); }
