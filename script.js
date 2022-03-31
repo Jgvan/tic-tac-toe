@@ -103,7 +103,7 @@ const displayController = (() => {
 
     //Set the value of unselected squares to display for the :hover effect
     const toggleSquareSelection = symbol => {
-        let unselected = document.querySelectorAll(".unselected");
+        const unselected = document.querySelectorAll(".unselected");
 
         unselected.forEach((el) => {
             el.textContent = symbol;
@@ -112,7 +112,7 @@ const displayController = (() => {
 
     
     const resetGrid = () => {
-        let squares = document.querySelectorAll(".square");
+        const squares = document.querySelectorAll(".square");
 
         squares.forEach((square) => {
             square.classList.add("unselected");
@@ -166,8 +166,8 @@ const displayController = (() => {
         isAiOneSmart = isAiOneSmart.value === "hard" ? true : false;
         isAiTwoSmart = isAiTwoSmart.value === "hard" ? true : false;
 
-        let playerOne = player("X", playerOneName, isPlayerOneAI, isAiOneSmart);
-        let playerTwo = player("O", playerTwoName, isPlayerTwoAI, isAiTwoSmart);
+        const playerOne = player("X", playerOneName, isPlayerOneAI, isAiOneSmart);
+        const playerTwo = player("O", playerTwoName, isPlayerTwoAI, isAiTwoSmart);
 
         players.push(playerOne);
         players.push(playerTwo);
@@ -176,7 +176,7 @@ const displayController = (() => {
 
     //Add or remove hover class to squares
     const setHoverClass = enable => {
-        let squares = document.querySelectorAll(".square")
+        const squares = document.querySelectorAll(".square")
         squares.forEach(square => {
             if(enable === true && square.classList.contains("unselected")){
                 square.classList.add("hover");
@@ -250,7 +250,7 @@ const gameController = (() => {
     //Clear the game board and start new game.
     const start = () => {
         gameOver();
-        let players = displayController.createPlayers();
+        const players = displayController.createPlayers();
         playerController.setPlayers(players[0], players[1]);
         displayController.resetGrid();
         displayController.toggleSquareSelection("X");
@@ -290,7 +290,7 @@ const gameController = (() => {
 
     //First turn? Pick a random corner
     const randomCorner = () => {
-        let corners = [0, 2, 6, 8];
+        const corners = [0, 2, 6, 8];
         return corners[Math.floor(Math.random() * 4)];
     }
 
@@ -302,7 +302,7 @@ const AIController = (() => {
 
     const bestMove = () => {
         let nextMove;
-        let openMoves = gameBoard.getIndices("");
+        const openMoves = gameBoard.getIndices("");
 
         let maxScore = -Infinity;
         for (let i = 0; i < openMoves.length; i++) {
@@ -318,9 +318,9 @@ const AIController = (() => {
     }
 
     const miniMax = (depth, isMaximizing) => {
-        let openMoves = gameBoard.getIndices("");
-        let marker = playerController.getActivePlayer().getMarker();
-        let result = gameBoard.checkForWinner(true);
+        const openMoves = gameBoard.getIndices("");
+        const marker = playerController.getActivePlayer().getMarker();
+        const result = gameBoard.checkForWinner(true);
 
         if (result === "tie") {
             return 0;
